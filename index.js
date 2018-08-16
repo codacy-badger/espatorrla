@@ -1,71 +1,76 @@
-const { load } = require('cheerio');
-const { map } = require('lodash')
+const { load} = require('cheerio');
+const { map, flatten } = require('lodash')
 const axios = require('axios');
 const { baseURLs, endpoint, categories } = require('./params.js')
 const querystring = require('querystring');
 
+// Custom things
 const log = console.log
 const error = console.error
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
+// Execute the main process
 executeExtraction()
 
+
+/**
+ * Main process. This process will get all the necessary info about torrents and
+ */
 async function executeExtraction() {
-  // Validamos que tengamos alguna web de la lista que funcione
   log('Obteniendo qué web está online...')
   const url = await getWorkingPage();
 
-  if(!url){
+  if (!url) {
     log('No se encontró ninguna web online en este momento');
     error('\tAbortando obtención de Torrents...')
     process.exit(-1)
   }
 
-  const categoriesInfo = await getCategoriesInfo(url)
+  const categoriesInfo = await getTorrents(url)
+  const flatInfo = flatten(categoriesInfo)
 
-  
+  log(flatInfo)
 
-  log(categoriesInfo)
-
-  const urls = map(categoriesInfo, i => i.link)
-  const content = await Promise.all(urls)
-
-  const torrents = map(content, c => getTorrentLink)
-  log(torrents)
-
-
+  return flatInfo
 }
 
-function getCategoriesInfo(url){
-  return new Promise((resolve, reject) => {
-    const categoriesInfo = []
-  
-  categories.forEach(async category => {
+function getTorrents(url) {
+  return new Promise(async (resolve, reject) => {
+    const categoriesInfo = await Promise.all(map(categories, category => getCategoryLinks(category, url)))
+    resolve(categoriesInfo)
+  })
+}
+
+function getCategoryLinks(category, url){
+  return new Promise(async (resolve, reject) => {
     let curPage = 1
     let finished = false
     let info = []
 
+    // Parameters in order to send the category to be searched and the date (Always)
+    const params = querystring.stringify({
+      categoryIDR: category.id,
+      date: 'Siempre'
+    })
+
+    // Looking for a breakpoint. In this initial state, 3 pages is OK in order to test if this runs ok
     while (!finished) {
-      const params = querystring.stringify({ 
-        categoryIDR: category.id,
-        date: 'Siempre'
-      })
       const { data } = await axios.post(`${url}/pg/${curPage++}`, params)
+      const entries = await getEntries(data, category)
 
-      const entries = await getEntries(data)
       info = info.concat(entries)
-
       finished = curPage == 3
     }
-    console.log(info)
-    categoriesInfo[category.id] = info
+
+    resolve(info)
   })
-  resolve(categoriesInfo)
-  })
-  
 }
 
-function getTorrentLink(content){
+/**
+ * Based on the HTML content of a web, extracts the link to the .torrent file
+ * @param {String} content HTML content of the page
+ */
+function getTorrentLink(content) {
   const regex = /window\.location\.href\s*=\s*"(.*)"/gm
 
   return new Promise(async (resolve, reject) => {
@@ -74,46 +79,53 @@ function getTorrentLink(content){
   })
 }
 
-function getEntries(html){
+/**
+ * On the "Last updated torrents" page, extracts all the movies and series with their link, title, quality and image
+ * @param {String} html Stringified HTML content of the web
+ * @returns {JSON} Torrent, Title, Quality, Image
+ */
+function getEntries(html, category) {
   return new Promise(async (resolve, reject) => {
     let $ = load(html)
 
     const elements = $('ul.noticias-series li')
 
-    const basicData = await Promise.all(map(elements, element => {
-      $ = load(element)  
+    const basicData = await Promise.all(map(elements, async element => {
+      $ = load(element)
       const info = $('div.info a:first-of-type')
-
-      const link = info.attr('href')
+      
       const title = info.attr('title')
       const quality = $('div.info #deco')[0].children[0].data.trim()
       const image = $('img').attr('src')
 
-      return { title, image, quality, link }
+      const { data } = await axios.get(info.attr('href'))
+      const link = await getTorrentLink(data)
+
+      return { title, image, quality, link, category }
     }))
 
     resolve(basicData)
   })
 }
 
-
-
-
-function getWorkingPage(){
+/**
+ * Retrieves which page of the parametrized ones are working in the moment of the execution
+ * @returns Base URL of a working page for looking for torrents
+ */
+function getWorkingPage() {
   return new Promise(async (resolve, reject) => {
     let urlOK
 
-    for(let i = 0; i<baseURLs.length; i++){
+    for (let i = 0; i < baseURLs.length; i++) {
       const url = `${baseURLs[i]}${endpoint}`
 
       try {
         await axios.get(url)
-        log(`\t${baseURLs[i]} online!`)
+        log(`  ${baseURLs[i]} online!`)
         urlOK = url
         break
-      } catch(exception) {
+      } catch (exception) {
         log(`\t${baseURLs[i]} no se encuentra online.`)
-        error(exception)
       }
     }
 
