@@ -1,0 +1,32 @@
+{
+  "SPANISH_FILMS": {
+    "id": "757",
+    "description": "Películas Castellano",
+    "hasEpisodes": false
+  },
+  "TV_SHOWS": {
+    "id": "767",
+    "description": "Series",
+    "hasEpisodes": true
+  },
+  "DOCUMENTARIES": {
+    "id": "780",
+    "description": "Documentales",
+    "hasEpisodes": false
+  },
+  "HD_MOVIES": {
+    "id": "1027",
+    "description": "Cine Alta Definicion HD",
+    "hasEpisodes": false
+  },
+  "HD_TV_SHOWS": {
+    "id": "1469",
+    "description": "Series Alta Definicion HD",
+    "hasEpisodes": true
+  },
+  "HD_3D_MOVIES": {
+    "id": "1599",
+    "description": "Películas en 3D HD",
+    "hasEpisodes": true
+  }
+}

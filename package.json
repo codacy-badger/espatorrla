@@ -1,16 +1,21 @@
 {
   "name": "altorrentative",
   "version": "1.0.0",
-  "description": "",
+  "description": "Avoid torrent pages ads, coinminers and bloatware with this torrent scraper",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
-  "author": "",
+  "author": "David de los Santos Boix <ddlsb@hotmail.com>",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
     "lodash": "^4.17.10"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^5.2.0"
   }
 }

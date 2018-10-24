@@ -55,11 +55,21 @@ function getCategoryLinks(category, url){
 
     // Looking for a breakpoint. In this initial state, 3 pages is OK in order to test if this runs ok
     while (!finished) {
-      const { data } = await axios.post(`${url}/pg/${curPage++}`, params)
-      const entries = await getEntries(data, category)
+      console.info(`Categoría: ${category.name}`)
+      console.info(`Página: ${curPage}`)
+      try {
+        let { data } = await axios.post(`${url}/pg/${curPage++}`, params)
+        let entries = await getEntries(data, category)
+  
+        info = info.concat(entries)
+        finished = entries.length === 0
 
-      info = info.concat(entries)
-      finished = curPage == 3
+        data = null
+        entries = null
+      } catch(ex) {
+        console.log('---------------------')
+        console.log(ex)
+      }
     }
 
     resolve(info)
@@ -75,7 +85,12 @@ function getTorrentLink(content) {
 
   return new Promise(async (resolve, reject) => {
     const regexResult = regex.exec(content)
-    resolve(regexResult[1])
+
+    if(!regexResult){
+      reject()
+    } else {
+      resolve(regexResult[1])
+    }
   })
 }
 
@@ -92,19 +107,33 @@ function getEntries(html, category) {
 
     const basicData = await Promise.all(map(elements, async element => {
       $ = load(element)
+      element = null
       const info = $('div.info a:first-of-type')
       
       const title = info.attr('title')
       const quality = $('div.info #deco')[0].children[0].data.trim()
       const image = $('img').attr('src')
+      const url = info.attr('href')
 
-      const { data } = await axios.get(info.attr('href'))
-      const link = await getTorrentLink(data)
+      let { data } = await axios.get(url)
+      let torrent = undefined
 
-      return { title, image, quality, link, category }
+      try{
+        torrent = await getTorrentLink(data)
+      } catch (ex) {
+        // Do things
+      }
+      data  =null
+
+      return { title, image, quality, torrent, category, url }
     }))
 
-    resolve(basicData)
+    const onlyWithTorrents = basicData.filter(element => element.torrent)
+
+    const noTorrents = basicData.filter(element => !element.torrent)
+    if(noTorrents.length > 0) console.log(noTorrents)
+    
+    resolve(onlyWithTorrents)
   })
 }
 
