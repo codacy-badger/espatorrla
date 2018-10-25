@@ -56,16 +56,6 @@ describe('Get entries for a given category', () => {
       }
       expect(getItemsForCategory(options)).to.be.rejected
     });
-  
-    it('should fail with no category description provided', async () => {
-      const options = {
-        url: "whatever",
-        category: {
-          id: "whatever"
-        }
-      }
-      expect(getItemsForCategory(options)).to.be.rejected
-    });
 
     it('should fail with page limit lower than 1', async () => {
       const options = {
@@ -91,9 +81,8 @@ describe('Get entries for a given category', () => {
   */
 
   describe('Item retrieval', () => {
-    it('should return 0 items on an unexisting category', async (done) => {
+    it('should return 0 items on an unexisting category', async () => {
       const url = await getWorkingPage()
-  
       const options = {
         url: url,
         category: {
@@ -109,9 +98,12 @@ describe('Get entries for a given category', () => {
     });
   
     it('should return some items in an existing category', async () => {
+      const url = await getWorkingPage()
+
       const options = {
-        id: '1027',   // HD Movies
-        pages: 1      // Stop early
+        url: url,
+        category: CATEGORY,
+        limitPage: 1   
       }
   
       const entries = await getItemsForCategory(options)
@@ -121,9 +113,12 @@ describe('Get entries for a given category', () => {
     });
   
     it('should return 30 items limiting the page to 2', async () => {
+      const url = await getWorkingPage()
+
       const options = {
-        id: '1027',   // HD Movies
-        pages: 2      // Required pages
+        url: url,
+        category: CATEGORY,
+        limitPage: 2   
       }
   
       const entries = await getItemsForCategory(options)
@@ -134,9 +129,12 @@ describe('Get entries for a given category', () => {
     });
   
     it('should return required information about every item', async () => {
+      const url = await getWorkingPage()
+
       const options = {
-        id: '1027',   // HD Movies
-        pages: 1      // Stop early
+        url: url,
+        category: CATEGORY,
+        limitPage: 1   
       }
   
       const entries = await getItemsForCategory(options)

@@ -4,7 +4,7 @@
   "description": "Avoid torrent pages ads, coinminers and bloatware with this torrent scraper",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 10000"
   },
   "author": "David de los Santos Boix <ddlsb@hotmail.com>",
   "license": "ISC",

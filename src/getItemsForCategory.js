@@ -3,6 +3,7 @@ const axios = require('axios');
 const querystring = require('querystring');
 const map = require('lodash/map')
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.timeout = 2500;
 
 // Scraping
 const { load } = require('cheerio');
@@ -59,14 +60,24 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
 
     // Looking for a breakpoint. In this initial state, 3 pages is OK in order to test if this runs ok
     while (true) {
-      console.debug(`  Page ${curPage}`)
-      const { data } = await axios.post(`${url}/pg/${curPage++}`, params)
+      console.log(`  Page ${curPage}/${limitPage}`)
+
+      let data
+      try {
+        const res = await axios.post(`${url}/pg/${curPage}`, params)
+        data = res.data
+      } catch (ex) {
+        console.error(`Error geting results from ${url}`)
+        reject()
+        return
+      }
+
       const pageItems = await getItemsFromHTML(data, category)
 
       if(pageItems.length < 1) break
 
       items = items.concat(pageItems)
-
+      
       // Stop if the limit page has been reached
       if (limitPage && curPage >= limitPage) break
 
@@ -75,8 +86,9 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
         const item = pageItems.filter(item => item.link === limitItem)
         if (item && item.length > 0) break
       }
-    }
 
+      curPage++
+    }
     resolve(items)
   })
 }
@@ -95,11 +107,13 @@ function getItemsFromHTML(html, category) {
     const basicData = await Promise.all(map(elements, async element => {
       $ = load(element)
       const info = $('div.info a:first-of-type')
+      
+      const url = info.attr('href')
+      const image = $('img').attr('src')
       const title = info.attr('title')
       const quality = $('div.info #deco')[0].children[0].data.trim()
-      const image = $('img').attr('src')
 
-      return { title, image, quality, category }
+      return { url, title, image, quality, category }
     }))
 
     resolve(basicData)
