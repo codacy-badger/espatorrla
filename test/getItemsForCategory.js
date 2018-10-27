@@ -68,6 +68,18 @@ describe('Get entries for a given category', () => {
       }
       expect(getItemsForCategory(options)).to.be.rejected
     });
+
+    it('should fail with an unexisting page', async () => {
+      const options = {
+        url: "whatever",
+        category: {
+          id: "whatever",
+          description: "whatever"
+        },
+        limitPage: 1
+      }
+      expect(getItemsForCategory(options)).to.be.rejected
+    });
   })
 
   /*
