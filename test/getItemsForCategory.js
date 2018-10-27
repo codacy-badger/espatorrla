@@ -64,7 +64,7 @@ describe('Get entries for a given category', () => {
           id: "whatever",
           description: "whatever"
         },
-        pageLimit: -1
+        limitPage: -1
       }
       expect(getItemsForCategory(options)).to.be.rejected
     });
@@ -126,6 +126,33 @@ describe('Get entries for a given category', () => {
       assert.isArray(entries)
       assert.isNotEmpty(entries)
       expect(entries).to.have.lengthOf(30)
+    });
+
+    it('should return less items on a daily basis than weekly', async () => {
+      const url = await getWorkingPage()
+
+      const dayOptions = {
+        url: url,
+        category: CATEGORY,
+        date: 'Hoy'
+      }
+  
+      const dayEntries = await getItemsForCategory(dayOptions)
+      assert.isDefined(dayEntries)
+      assert.isArray(dayEntries)
+
+      const monthOptions = {
+        url: url,
+        category: CATEGORY,
+        date: 'Mes'
+      }
+
+      const monthEntries = await getItemsForCategory(monthOptions)
+      assert.isDefined(monthEntries)
+      assert.isArray(monthEntries)
+      assert.isNotEmpty(monthEntries)
+
+      assert.isBelow(dayEntries.length, monthEntries.length)
     });
   
     it('should return required information about every item', async () => {
