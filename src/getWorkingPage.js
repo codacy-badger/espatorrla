@@ -21,7 +21,7 @@ function getWorkingPage(urls = DEFAULT_URLS) {
       }
     }
 
-    if(!workingURL){
+    if (!workingURL) {
       reject(undefined)
     } else {
       resolve(workingURL)

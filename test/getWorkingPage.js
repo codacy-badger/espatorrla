@@ -19,6 +19,6 @@ describe('Get Torrent Working page', () => {
   });
 
   it('should be rejected on an unexisting page', () => {
-    expect( getWorkingPage([''])).to.be.rejected
+    expect(getWorkingPage([''])).to.be.rejected
   });
 });

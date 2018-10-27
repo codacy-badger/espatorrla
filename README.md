@@ -9,17 +9,17 @@ This tool aims to extract all the desired torrents from Spanish Torrent Pages wi
 
 ## Installation
 ```sh
-$ git clone https://github.com/Dionakra/altorrnativent.git
-$ cd altorrnativent
-$ npm install
+git clone https://github.com/Dionakra/altorrnativent.git
+cd altorrnativent
+npm install
 ```
 
 ## Testing
 ```sh
-$ npm run test
+npm run test
 ```
 
 ## Built with
-*  Axios
+* Axios
 *  CheerioJS
 *  Lodash

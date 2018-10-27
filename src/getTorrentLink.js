@@ -4,7 +4,7 @@ const axios = require('axios');
  * Obtains the torrent of a given URL. If there is no torrent associated with it, returns undefined
  * @param {String} url URL of the site to be extracted
  */
-function getTorrentLink(url){
+function getTorrentLink(url) {
   return new Promise((resolve, reject) => {
     axios.get(url)
       .then(res => {
@@ -26,7 +26,7 @@ function extractTorrentLink(content) {
   return new Promise(async (resolve, reject) => {
     const regexResult = regex.exec(content)
 
-    if(regexResult == null){
+    if (regexResult == null) {
       reject(undefined)
     } else {
       resolve(regexResult[1])

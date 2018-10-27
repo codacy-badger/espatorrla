@@ -10,8 +10,8 @@ const { load } = require('cheerio');
 
 // POST params
 const postParams = {
-  date: 'Siempre',        // By default, search everything. When on batch, search only 'Semana' in order to speed up the queries
-  categoryIDR: undefined  // Category to be searched
+  date: 'Siempre', // By default, search everything. When on batch, search only 'Semana' in order to speed up the queries
+  categoryIDR: undefined // Category to be searched
 }
 
 function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
@@ -41,7 +41,7 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
     }
 
     // Defaults configuration
-    if(date) postParams.date = date
+    if (date) postParams.date = date
     postParams.categoryIDR = category.id
     const hasEpisodes = category.hasEpisodes
 
@@ -49,8 +49,13 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
     console.info(`Looking for items in category: ${category.description}`)
     console.info(` Has episodes? ${hasEpisodes}`)
 
-    if(limitPage) console.info(` Limit Page: ${limitPage}`)
-    if(limitItem) console.info(` Limit Item: ${limitItem}`)
+    if (limitPage) {
+      console.info(` Limit Page: ${limitPage}`)
+    }
+
+    if (limitItem) {
+      console.info(` Limit Item: ${limitItem}`)
+    }
 
     // Parameters in order to send the category to be searched and the date (Always)
     const params = querystring.stringify(postParams)
@@ -60,7 +65,7 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
 
     // Looking for a breakpoint. In this initial state, 3 pages is OK in order to test if this runs ok
     while (true) {
-      console.log(`  Page ${curPage}/${limitPage}`)
+      console.log(`  Page ${curPage}/${limitPage || ""}`)
 
       let data
       try {
@@ -73,13 +78,16 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
       }
 
       const pageItems = await getItemsFromHTML(data, category)
-
-      if(pageItems.length < 1) break
+      if (pageItems.length < 1) {
+        break
+      }
 
       items = items.concat(pageItems)
-      
+
       // Stop if the limit page has been reached
-      if (limitPage && curPage >= limitPage) break
+      if (limitPage && curPage >= limitPage) {
+        break
+      }
 
       // Stop if the limit item has been reached
       if (limitItem) {
@@ -107,7 +115,7 @@ function getItemsFromHTML(html, category) {
     const basicData = await Promise.all(map(elements, async element => {
       $ = load(element)
       const info = $('div.info a:first-of-type')
-      
+
       const url = info.attr('href')
       const image = $('img').attr('src')
       const title = info.attr('title')

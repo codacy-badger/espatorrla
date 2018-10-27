@@ -29,14 +29,14 @@ describe('Get entries for a given category', () => {
     it('should fail with no URL provided', async () => {
       expect(getItemsForCategory({})).to.be.rejected
     });
-  
+
     it('should fail with no category provided', async () => {
       const options = {
         url: "whatever"
       }
       expect(getItemsForCategory(options)).to.be.rejected
     });
-  
+
     it('should fail with no category id provided', async () => {
       const options = {
         url: "whatever",
@@ -46,7 +46,7 @@ describe('Get entries for a given category', () => {
       }
       expect(getItemsForCategory(options)).to.be.rejected
     });
-  
+
     it('should fail with no category description provided', async () => {
       const options = {
         url: "whatever",
@@ -102,37 +102,37 @@ describe('Get entries for a given category', () => {
           description: 'whatever'
         }
       }
-  
+
       const entries = await getItemsForCategory(options)
       assert.isDefined(entries)
       assert.isArray(entries)
       assert.isEmpty(entries)
     });
-  
+
     it('should return some items in an existing category', async () => {
       const url = await getWorkingPage()
 
       const options = {
         url: url,
         category: CATEGORY,
-        limitPage: 1   
+        limitPage: 1
       }
-  
+
       const entries = await getItemsForCategory(options)
       assert.isDefined(entries)
       assert.isArray(entries)
       assert.isNotEmpty(entries)
     });
-  
+
     it('should return 30 items limiting the page to 2', async () => {
       const url = await getWorkingPage()
 
       const options = {
         url: url,
         category: CATEGORY,
-        limitPage: 2   
+        limitPage: 2
       }
-  
+
       const entries = await getItemsForCategory(options)
       assert.isDefined(entries)
       assert.isArray(entries)
@@ -148,7 +148,7 @@ describe('Get entries for a given category', () => {
         category: CATEGORY,
         date: 'Hoy'
       }
-  
+
       const dayEntries = await getItemsForCategory(dayOptions)
       assert.isDefined(dayEntries)
       assert.isArray(dayEntries)
@@ -166,21 +166,21 @@ describe('Get entries for a given category', () => {
 
       assert.isBelow(dayEntries.length, monthEntries.length)
     });
-  
+
     it('should return required information about every item', async () => {
       const url = await getWorkingPage()
 
       const options = {
         url: url,
         category: CATEGORY,
-        limitPage: 1   
+        limitPage: 1
       }
-  
+
       const entries = await getItemsForCategory(options)
       assert.isDefined(entries)
       assert.isArray(entries)
       assert.isNotEmpty(entries)
-  
+
       const item = entries[0]
       expect(item).to.have.property('title')
       expect(item).to.have.property('image')
@@ -195,14 +195,14 @@ describe('Get entries for a given category', () => {
       const options = {
         url: url,
         category: CATEGORY,
-        limitPage: 2   
+        limitPage: 2
       }
-  
+
       const entries = await getItemsForCategory(options)
       assert.isDefined(entries)
       assert.isArray(entries)
       assert.isNotEmpty(entries)
-  
+
       const limitItem = entries[5]
       expect(limitItem).to.have.property('title')
       expect(limitItem).to.have.property('image')
