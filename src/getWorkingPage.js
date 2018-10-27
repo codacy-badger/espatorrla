@@ -1,11 +1,11 @@
 const axios = require('axios');
-const urls = ['http://torrentrapid.com/ultimas-descargas', 'http://descargas2020.com/ultimas-descargas']
+const DEFAULT_URLS = ['http://torrentrapid.com/ultimas-descargas', 'http://descargas2020.com/ultimas-descargas']
 
 /**
  * Retrieves which page of the parametrized ones are working in the moment of the execution
  * @returns Base URL of a working page for looking for torrents
  */
-function getWorkingPage() {
+function getWorkingPage(urls = DEFAULT_URLS) {
   return new Promise(async (resolve, reject) => {
     let workingURL
 

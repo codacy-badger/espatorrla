@@ -1,3 +1,8 @@
+const chaiAsPromised = require('chai-as-promised')
+const chai = require('chai')
+chai.use(chaiAsPromised)
+
+const expect = chai.expect;
 const assert = require('chai').assert
 const { getWorkingPage } = require('../src/getWorkingPage')
 
@@ -11,5 +16,9 @@ describe('Get Torrent Working page', () => {
       .catch(url => {
         assert.isUndefined(url)
       })
+  });
+
+  it('should be rejected on an unexisting page', () => {
+    expect( getWorkingPage([''])).to.be.rejected
   });
 });
