@@ -2,8 +2,9 @@ const axios = require('axios');
 const DEFAULT_URLS = ['http://torrentrapid.com/ultimas-descargas', 'http://descargas2020.com/ultimas-descargas']
 
 /**
- * Retrieves which page of the parametrized ones are working in the moment of the execution
- * @returns Base URL of a working page for looking for torrents
+ * Return which URL is online to perform further scraping on torrents,
+ * @param {Array[String]} urls List of URLs to be checked. By default, there are TorrentRapid and Descargas2020.
+ * @returns {Promise<String>} If any URL is working, it returns the working URL. If not, the method is rejected.
  */
 function getWorkingPage(urls = DEFAULT_URLS) {
   return new Promise(async (resolve, reject) => {

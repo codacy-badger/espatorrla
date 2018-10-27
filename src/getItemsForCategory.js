@@ -14,6 +14,48 @@ const postParams = {
   categoryIDR: undefined // Category to be searched
 }
 
+/**
+ * On the "Last updated torrents" page, extracts all the movies and series with their link, title, quality and image
+ * @param {String} html Stringified HTML content of the web
+ * @returns {JSON} Torrent, Title, Quality, Image
+ */
+function getItemsFromHTML(html, category) {
+  return new Promise(async (resolve, reject) => {
+    let $ = load(html)
+    const elements = $('ul.noticias-series li')
+
+    const basicData = await Promise.all(map(elements, async element => {
+      $ = load(element)
+      const info = $('div.info a:first-of-type')
+
+      const url = info.attr('href')
+      const image = $('img').attr('src')
+      const title = info.attr('title')
+      const quality = $('div.info #deco')[0].children[0].data.trim()
+
+      return { url, title, image, quality, category }
+    }))
+
+    resolve(basicData)
+  })
+}
+
+/**
+ * Obtain the last updated items based on the search criteria.
+ * @param {Object} options Object regarding the following attributes:
+ *                  * url: Working URL of the torrent webpage to be scraped. **Required**.
+ *                  * category:
+ *                      * id: Identifier of the category handled by the web. It can be found on ~/categories.json. **Required**-
+ *                      * description: Description of the category. Sames as `category.id`. **Required**.
+ *                  * limitPage: Max number of pages to be scraped. _Optional_.
+ *                  * limitItem: URL of the last item to be scraped. _Optional_.
+ *                  * date: Max time to perform the search. _Optional_. Default value is `Siempre`. Available values are:
+ *                      * `Hoy`: Torrents uploaded today.
+ *                      * `Ayer`: Torrents uploaded since yesterday.
+ *                      * `Semana`: Torrents uploaded since a week.
+ *                      * `Mes`: Torrents uploaded since a month.
+ *                      * `Siempre`: All torrents.
+ */
 function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
   return new Promise(async (resolve, reject) => {
     if (!url) {
@@ -92,39 +134,14 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
       // Stop if the limit item has been reached
       if (limitItem) {
         const item = pageItems.filter(item => item.url === limitItem)
-        if (item && item.length > 0) break
+        if (item && item.length > 0) {
+          break
+        }
       }
 
       curPage++
     }
     resolve(items)
-  })
-}
-
-
-/**
- * On the "Last updated torrents" page, extracts all the movies and series with their link, title, quality and image
- * @param {String} html Stringified HTML content of the web
- * @returns {JSON} Torrent, Title, Quality, Image
- */
-function getItemsFromHTML(html, category) {
-  return new Promise(async (resolve, reject) => {
-    let $ = load(html)
-    const elements = $('ul.noticias-series li')
-
-    const basicData = await Promise.all(map(elements, async element => {
-      $ = load(element)
-      const info = $('div.info a:first-of-type')
-
-      const url = info.attr('href')
-      const image = $('img').attr('src')
-      const title = info.attr('title')
-      const quality = $('div.info #deco')[0].children[0].data.trim()
-
-      return { url, title, image, quality, category }
-    }))
-
-    resolve(basicData)
   })
 }
 
