@@ -83,7 +83,7 @@ function getItemsForCategory({ url, category, limitPage, limitItem, date }) {
 
       // Stop if the limit item has been reached
       if (limitItem) {
-        const item = pageItems.filter(item => item.link === limitItem)
+        const item = pageItems.filter(item => item.url === limitItem)
         if (item && item.length > 0) break
       }
 

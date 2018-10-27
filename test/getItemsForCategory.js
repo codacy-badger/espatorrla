@@ -176,5 +176,40 @@ describe('Get entries for a given category', () => {
       expect(item).to.have.property('category')
       expect(item).to.have.property('quality')
     });
+
+    it('should return less items on a limit item', async () => {
+      const url = await getWorkingPage()
+
+      const options = {
+        url: url,
+        category: CATEGORY,
+        limitPage: 2   
+      }
+  
+      const entries = await getItemsForCategory(options)
+      assert.isDefined(entries)
+      assert.isArray(entries)
+      assert.isNotEmpty(entries)
+  
+      const limitItem = entries[5]
+      expect(limitItem).to.have.property('title')
+      expect(limitItem).to.have.property('image')
+      expect(limitItem).to.have.property('url')
+      expect(limitItem).to.have.property('category')
+      expect(limitItem).to.have.property('quality')
+
+      const limitOptions = {
+        url: url,
+        category: CATEGORY,
+        limitItem: limitItem.url
+      }
+
+      const limitedEntries = await getItemsForCategory(limitOptions)
+      assert.isDefined(limitedEntries)
+      assert.isArray(limitedEntries)
+      assert.isNotEmpty(limitedEntries)
+
+      assert.isBelow(limitedEntries.length, entries.length)
+    });
   })
 });
