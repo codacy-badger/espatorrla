@@ -12,4 +12,9 @@ describe('Get Torrent Link for a given webpage', () => {
     const url = await getTorrentLink('http://torrentrapid.com/')
     assert.isUndefined(url)
   });
+
+  it('should return undefined for a non existing URL', async () => {
+    const url = await getTorrentLink('whatever')
+    assert.isUndefined(url)
+  });
 });

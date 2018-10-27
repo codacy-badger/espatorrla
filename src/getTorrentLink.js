@@ -25,8 +25,12 @@ function extractTorrentLink(content) {
 
   return new Promise(async (resolve, reject) => {
     const regexResult = regex.exec(content)
-    const torrentLink = regexResult ? regexResult[1] : undefined // Resolve nothing or the current link
-    resolve(torrentLink)
+
+    if(regexResult == null){
+      reject(undefined)
+    } else {
+      resolve(regexResult[1])
+    }
   })
 }
 
